@@ -2,29 +2,47 @@
 title: "Predicting Astronauts Mission Duration using Tidymodels in R"
 author: "Gaurav Sharma"
 date: "17/07/2020"
-output: github_document
+output: 
+    github_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,
+                      cache = TRUE,
+                      fig.width = 8,
+                      fig.height = 5,
+                      dpi = 180)
+library(tidyverse)
+library(tidymodels)
 ```
 
-## R Markdown
+### Load the data
+```{r}
+ttload <- tidytuesdayR::tt_load(x = "2020-07-14")
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+astranauts <- ttload$astronauts
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```
+### Some EDA
+Chang-Diaz, Franklin R. and Ross, Jerry L. have done the most number of missions in the history. Both have been to space 7 times. Both belong to US. 
+Following table sows top 10 astronauts with most number of trips
+```{r}
+astranauts %>% 
+    select(name, nationality, sex, hours_mission, total_hrs_sum) %>% 
+    count(nationality, name, sex, sort = T) %>% 
+    head(10) %>% 
+    knitr::kable()
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+There are 40 countries that have been to space at least once. US tops the lists with 854 missions, Russia has 273 mission so far. 
+Following table sows top 10 countries with most number of space missions.
+```{r}
+astranauts %>% 
+    select(nationality) %>% 
+    count(nationality, sort = T) %>% 
+    head(10) %>% 
+    knitr::kable()
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
