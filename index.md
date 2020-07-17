@@ -75,3 +75,48 @@ astranauts %>%
 | Italy          |  13 |
 | U.K./U.S.      |   6 |
 | Australia      |   4 |
+
+Let’s plot a visualization to see how duration of space mission has
+change over the decades.
+
+``` r
+astranauts %>% 
+  mutate(year_of_mission = 10*(year_of_mission %/% 10)) %>% 
+  mutate(year_of_mission = factor(year_of_mission)) %>% 
+  select(year_of_mission, hours_mission) %>% 
+  ggplot(aes(x = year_of_mission, y = hours_mission, color = year_of_mission)) +
+  geom_boxplot(show.legend = F) +
+  scale_y_log10() +
+  ggtitle("The average number of hours spent in space missions have increased significantly after 2010",) +
+  labs(x = NULL,
+       y = "Duration of Mission in Hours ")
+```
+
+    ## Warning: Transformation introduced infinite values in continuous y-axis
+
+    ## Warning: Removed 6 rows containing non-finite values (stat_boxplot).
+
+![](index_files/figure-gfm/unnamed-chunk-4-1.png)<!-- --> Interestingly,
+the duration of missions has increased over the decades and their is a
+significant jump in median duration after 2010, which generates a
+hypothesis here that year of mission can be a good predictor of duration
+of space mission. We will confirm this hypothesis later, let’s move
+further.
+
+Similarly, We can plot a similar visualization for the number of space
+mission in each decade. It will be interesting to see.
+
+``` r
+astranauts %>% 
+  mutate(year_of_mission = 10*(year_of_mission %/% 10)) %>% 
+  mutate(year_of_mission = factor(year_of_mission)) %>% 
+  count(year_of_mission) %>% 
+  ggplot(aes(x = year_of_mission, y = n, fill = year_of_mission)) +
+  geom_col(show.legend = F, alpha = 0.6) +
+  ggtitle("The number of space missions see a decreased trend after 1990",) +
+  labs(x = NULL,
+       y = "Number of Space Missions ") +
+  coord_flip()
+```
+
+![](index_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->

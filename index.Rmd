@@ -19,8 +19,8 @@ library(tidymodels)
 
 ### Load the data
 ```{r}
-#ttload <- tidytuesdayR::tt_load(x = "2020-07-14")
-#astranauts <- ttload$astronauts
+ttload <- tidytuesdayR::tt_load(x = "2020-07-14")
+astranauts <- ttload$astronauts
 ```
 ### Some EDA
 Chang-Diaz, Franklin R. and Ross, Jerry L. have done the most number of missions in the history. Both have been to space 7 times. Both belong to US. 
