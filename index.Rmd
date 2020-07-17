@@ -2,8 +2,7 @@
 title: "Predicting Astronauts Mission Duration using Tidymodels in R"
 author: "Gaurav Sharma"
 date: "17/07/2020"
-output: 
-    github_document
+output: github_document
 editor_options: 
   chunk_output_type: console
 ---
@@ -44,5 +43,9 @@ astranauts %>%
     count(nationality, sort = T) %>% 
     head(10) %>% 
     knitr::kable()
+```
+
+```{r}
+
 ```
 
