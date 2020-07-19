@@ -163,11 +163,13 @@ astranauts %>%
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
 ![](index_files/figure-gfm/unnamed-chunk-6-1.png)<!-- --> It seems that
-\* Sex or military/civilian are not very strong predictors of mission
-duration. \* Mission number and total number of mission show weak
-correlation with the outcome, hence they also don’t seem to be good
-predictors \* Occupation, year of mission and field 21 seem to be good
-predictors of the outcome.
+
+  - Sex or military/civilian are not very strong predictors of mission
+    duration.
+  - Mission number and total number of mission show weak correlation
+    with the outcome, hence they also don’t seem to be good predictors.
+  - Occupation, year of mission and field 21 seem to be good predictors
+    of the outcome.
 
 These arre some good hypothesis to test, We will test them while
 building the model.
