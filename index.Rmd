@@ -142,7 +142,7 @@ astro_recipe <- recipe(hours_mission~., data = astro_train) %>%
 ```
 
 ```{r}
-install.packages("baguette")
+#install.packages("baguette")
 library(baguette)
 
 tree_spec <- bag_tree() %>% 
