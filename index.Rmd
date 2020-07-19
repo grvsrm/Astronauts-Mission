@@ -73,16 +73,120 @@ astranauts %>%
   coord_flip()
 ```
 
+#### Lets do some more analysis to understand what can be a good predictor to predict mission duration
+```{r}
+astranauts %>%
+  select(
+    sex,
+    military_civilian,
+    mission_number,
+    total_number_of_missions,
+    occupation,
+    year_of_mission,
+    field21,
+    hours_mission
+  ) %>%
+  mutate(year_of_mission = 10 * (year_of_mission %/% 10)) %>% 
+  mutate(year_of_mission = factor(year_of_mission)) %>% 
+  mutate_if(is.character, factor) %>% 
+  mutate(field21 = as.factor(field21)) %>% 
+  GGally::ggpairs()
 
 
+```
+It seems that 
+* Sex or military/civilian are not very strong predictors of mission duration. 
+* Mission number and total number of mission show weak correlation with the outcome, hence they also don't seem to be good predictors
+* Occupation, year of mission and field 21 seem to be good predictors of the outcome.
+
+These arre some good hypothesis to test, We will test them while building the model.
 
 
+#### Let's prepare the dataset to build the model
+```{r}
+astronauts_df <- astranauts %>% 
+  select(name, mission_title, hours_mission,
+         sex, military_civilian, occupation, year_of_mission, in_orbit, mission_number, total_number_of_missions, field21) %>% 
+  filter(hours_mission>0) %>% 
+  mutate(hours_mission = log(hours_mission)) %>% 
+  mutate(in_orbit = case_when(str_detect(in_orbit, "^Salyut") ~ "Salyut",
+                              str_detect(in_orbit, "^STS") ~ "STS",
+                              TRUE ~ in_orbit)) %>% 
+  mutate(occupation = case_when(str_detect(occupation, "^flight") ~ "Flight engineer",
+                                str_detect(occupation, "tourist") ~ "Space tourist",
+                                str_detect(occupation, "pilot") ~ "Pilot",
+                                TRUE ~ occupation)) %>% 
+  mutate(occupation = str_to_title(occupation)) %>% 
+  na.omit()
+
+```
 
 
+#### Lets build the model
+We will create splits, make a recipe and then build the model
+Splits
+```{r}
+astro_split <- astronauts_df %>% 
+  initial_split(strata = hours_mission)
+astro_train <- training(astro_split)
+astro_test <- testing(astro_split)
+```
+
+Recipe
+```{r}
+astro_recipe <- recipe(hours_mission~., data = astro_train) %>% 
+  update_role(name, mission_title, new_role = "ID") %>% 
+  step_other(in_orbit, occupation, threshold = 0.005) %>% 
+  themis::step_upsample(sex) %>% 
+  step_dummy(all_nominal(), -has_role("ID"))
+```
+
+```{r}
+install.packages("baguette")
+library(baguette)
+
+tree_spec <- bag_tree() %>% 
+  set_engine(engine = "rpart", times = 25) %>% 
+  set_mode(mode = "regression")
 
 
+mars_spec <- bag_mars() %>% 
+  set_engine(engine = "earth", times = 25) %>% 
+  set_mode(mode = "regression")
 
 
+astro_wf <- workflow() %>% 
+  add_recipe(recipe = astro_recipe)
 
+
+tree_fit <- astro_wf %>% 
+  add_model(tree_spec) %>% 
+  fit(astro_train)
+
+mars_fit <- astro_wf %>% 
+  add_model(mars_spec) %>% 
+  fit(astro_train)
+
+```
+
+Let's check our predictions
+```{r}
+
+test_rs <- astro_test %>% 
+  bind_cols(predict(tree_fit, astro_test)) %>% 
+  rename(.pred_tree = .pred) %>% 
+  bind_cols(predict(mars_fit, astro_test)) %>% 
+  rename(.pred_mars = .pred)
+
+```
+
+Let's compare the results using some visualizations
+```{r}
+test_rs %>% 
+  metrics(hours_mission, .pred_tree)
+
+test_rs %>% 
+  metrics(hours_mission, .pred_mars)
+```
 
 
